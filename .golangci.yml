@@ -1,0 +1,66 @@
+run:
+  timeout: 5m
+
+issues:
+  exclude-dirs:
+    - vendor
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+  misspell:
+    locale: US
+  funlen:
+    lines: 70
+    statements: 40
+  gocognit:
+    min-complexity: 15
+  revive:
+    rules:
+      - name: unused-parameter
+  nestif:
+    min-complexity: 3
+
+linters:
+  disable-all: true
+  enable:
+    - bodyclose
+    - copyloopvar
+    - dogsled
+    - dupl
+    - errcheck
+    - errorlint
+    - durationcheck
+    - funlen
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofmt
+    - goimports
+    - revive
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - prealloc
+    - staticcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - deadcode
+    - whitespace
+    - gocognit
+    - nestif
+    - predeclared
+    - makezero
+
+service:
+  golangci-lint-version: 1.58.x

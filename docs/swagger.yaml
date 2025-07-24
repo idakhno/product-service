@@ -1,0 +1,339 @@
+basePath: /
+definitions:
+  domain.Order:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/domain.OrderItem'
+        type: array
+      totalAmount:
+        format: float64
+        type: number
+      userID:
+        type: string
+    type: object
+  domain.OrderItem:
+    properties:
+      id:
+        type: string
+      priceAtPurchase:
+        format: float64
+        type: number
+      productID:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  domain.Product:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      price:
+        format: float64
+        type: number
+      quantity:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
+  domain.User:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      firstname:
+        type: string
+      id:
+        type: string
+      isMarried:
+        type: boolean
+      lastname:
+        type: string
+      passwordHash:
+        type: string
+    type: object
+  handler.CreateOrderRequest:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/handler.OrderItemInput'
+        minItems: 1
+        type: array
+    required:
+    - items
+    type: object
+  handler.CreateProductRequest:
+    properties:
+      description:
+        example: High-quality wireless headphones
+        type: string
+      price:
+        example: 99.99
+        type: number
+      quantity:
+        example: 100
+        type: integer
+      tags:
+        example:
+        - audio
+        - electronics
+        - wireless
+        items:
+          type: string
+        type: array
+    required:
+    - description
+    - price
+    - quantity
+    - tags
+    type: object
+  handler.LoginRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      password:
+        example: password123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  handler.LoginResponse:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  handler.OrderItemInput:
+    properties:
+      product_id:
+        type: string
+      quantity:
+        type: integer
+    required:
+    - product_id
+    - quantity
+    type: object
+  handler.RegisterRequest:
+    properties:
+      age:
+        example: 25
+        minimum: 18
+        type: integer
+      email:
+        example: user@example.com
+        type: string
+      firstname:
+        example: John
+        type: string
+      is_married:
+        example: false
+        type: boolean
+      lastname:
+        example: Doe
+        type: string
+      password:
+        example: password123
+        minLength: 8
+        type: string
+    required:
+    - age
+    - email
+    - firstname
+    - lastname
+    - password
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  title: Product API
+  version: "1.0"
+paths:
+  /orders:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Order details
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Order'
+        "400":
+          description: Invalid request body or product not found
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new order
+      tags:
+      - orders
+  /products:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Product details
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Product'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new product
+      tags:
+      - products
+  /products/{id}:
+    get:
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Product'
+        "400":
+          description: Invalid product ID
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Product not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get a product by ID
+      tags:
+      - products
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/handler.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.LoginResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "401":
+          description: Invalid email or password
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Log in a user
+      tags:
+      - users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User registration details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.User'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            type: string
+        "409":
+          description: User with this email already exists
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

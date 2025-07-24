@@ -1,0 +1,42 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+# Compiled Go programs
+*.test
+*.exe
+# Local binaries/build directories
+bin/
+build/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Dependencies
+vendor/
+
+# Environment variables
+.env
+# Potentially more specific env files
+.env.*
+.envrc
+
+# IDE settings
+.idea/
+.vscode/
+
+# Editor temporary files
+*~
+*.swp
+*.bak
+
+# macOS specific files
+.DS_Store
+
+# Go build cache and test artifacts
+_test/
