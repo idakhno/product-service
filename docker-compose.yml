@@ -1,4 +1,5 @@
 services:
+  # API service
   api:
     build:
       context: .
@@ -15,7 +16,10 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - SENTRY_DSN=${SENTRY_DSN}
     restart: always
+    networks:
+      - app-network
 
+  # PostgreSQL database
   db:
     image: postgres:15-alpine
     environment:
@@ -31,6 +35,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

@@ -11,20 +11,24 @@ import (
 	"github.com/google/uuid"
 )
 
+// OrderItemInput contains information about a single item in an order.
 type OrderItemInput struct {
 	ProductID uuid.UUID `json:"product_id" validate:"required"`
 	Quantity  int       `json:"quantity" validate:"required,gt=0"`
 }
 
+// CreateOrderRequest contains data for creating a new order.
 type CreateOrderRequest struct {
 	Items []OrderItemInput `json:"items" validate:"required,min=1,dive"`
 }
 
+// OrderHandler handles HTTP requests related to orders.
 type OrderHandler struct {
 	service *service.OrderService
 	logger  logger.Logger
 }
 
+// NewOrderHandler creates a new order handler.
 func NewOrderHandler(s *service.OrderService, l logger.Logger) *OrderHandler {
 	return &OrderHandler{service: s, logger: l}
 }
@@ -65,7 +69,6 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convert handler DTO to service DTO
 	serviceItems := make([]service.OrderItemInput, len(req.Items))
 	for i, item := range req.Items {
 		serviceItems[i] = service.OrderItemInput{

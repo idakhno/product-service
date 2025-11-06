@@ -32,14 +32,13 @@ type UserServiceTestSuite struct {
 func (s *UserServiceTestSuite) SetupSuite() {
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME") + "_test_user" // Use a dedicated test database
+	dbName := os.Getenv("DB_NAME") + "_test_user"
 	maintenanceDbUrl := "postgres://" + dbUser + ":" + dbPassword + "@localhost:5434/postgres?sslmode=disable"
 	testDbUrl := "postgres://" + dbUser + ":" + dbPassword + "@localhost:5434/" + dbName + "?sslmode=disable"
 
 	var err error
 	var maintenanceDb *pgxpool.Pool
 
-	// Retry logic for connecting to the maintenance database
 	for i := 0; i < 10; i++ {
 		maintenanceDb, err = pgxpool.New(context.Background(), maintenanceDbUrl)
 		if err == nil {
@@ -50,18 +49,15 @@ func (s *UserServiceTestSuite) SetupSuite() {
 	}
 	s.Require().NoError(err, "Failed to connect to maintenance database after retries")
 
-	// Drop and create test database
 	_, err = maintenanceDb.Exec(context.Background(), "DROP DATABASE IF EXISTS "+dbName)
 	s.Require().NoError(err)
 	_, err = maintenanceDb.Exec(context.Background(), "CREATE DATABASE "+dbName)
 	s.Require().NoError(err)
 	maintenanceDb.Close()
 
-	// Connect to the new test database
 	s.dbpool, err = pgxpool.New(context.Background(), testDbUrl)
 	s.Require().NoError(err)
 
-	// Run migrations on the test database
 	m, err := migrate.New("file://../../migrations", testDbUrl)
 	s.Require().NoError(err)
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
@@ -115,8 +111,6 @@ func (s *UserServiceTestSuite) TestLogin_Success() {
 	token, err := s.service.Login(ctx, email, password)
 	s.NoError(err)
 	s.NotEmpty(token)
-
-	// Verify JWT claims
 	tokenClaims := jwt.MapClaims{}
 	parsedToken, err := jwt.ParseWithClaims(token, tokenClaims, func(token *jwt.Token) (interface{}, error) {
 		return s.jwtSecret, nil

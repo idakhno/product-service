@@ -11,10 +11,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// ProductRepository implements repository.ProductRepository interface for PostgreSQL.
 type ProductRepository struct {
 	db *pgxpool.Pool
 }
 
+// NewProductRepository creates a new product repository for PostgreSQL.
 func NewProductRepository(db *pgxpool.Pool) *ProductRepository {
 	return &ProductRepository{db: db}
 }
@@ -77,6 +79,8 @@ func (r *ProductRepository) Update(ctx context.Context, product *domain.Product)
 	return err
 }
 
+// FindByIDTx finds a product by ID within a transaction with row lock (FOR UPDATE).
+// Used to prevent race conditions when updating product quantity.
 func (r *ProductRepository) FindByIDTx(ctx context.Context, tx pgx.Tx, id uuid.UUID) (*domain.Product, error) {
 	query := `SELECT id, description, tags, quantity, price FROM products WHERE id = $1 FOR UPDATE`
 

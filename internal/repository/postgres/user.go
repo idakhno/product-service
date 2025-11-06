@@ -11,10 +11,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// UserRepository implements repository.UserRepository interface for PostgreSQL.
 type UserRepository struct {
 	db *pgxpool.Pool
 }
 
+// NewUserRepository creates a new user repository for PostgreSQL.
 func NewUserRepository(db *pgxpool.Pool) *UserRepository {
 	return &UserRepository{db: db}
 }

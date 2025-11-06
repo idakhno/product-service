@@ -2,6 +2,7 @@ package domain
 
 import "github.com/google/uuid"
 
+// User represents a user in the system.
 type User struct {
 	ID           uuid.UUID
 	Firstname    string
@@ -9,9 +10,10 @@ type User struct {
 	Email        string
 	Age          int
 	IsMarried    bool
-	PasswordHash string
+	PasswordHash string // Password hash (bcrypt)
 }
 
+// FullName returns the user's full name.
 func (u *User) FullName() string {
 	return u.Firstname + " " + u.Lastname
 }

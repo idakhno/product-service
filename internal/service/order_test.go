@@ -39,7 +39,6 @@ func (s *OrderServiceTestSuite) SetupSuite() {
 	var err error
 	var maintenanceDb *pgxpool.Pool
 
-	// Retry logic for connecting to the maintenance database
 	for i := 0; i < 10; i++ {
 		maintenanceDb, err = pgxpool.New(context.Background(), maintenanceDbUrl)
 		if err == nil {
@@ -85,7 +84,6 @@ func (s *OrderServiceTestSuite) TearDownTest() {
 func (s *OrderServiceTestSuite) TestCreateOrder_Success() {
 	ctx := context.Background()
 
-	// 1. Setup: Create a user and a product
 	user := &domain.User{
 		ID:        uuid.New(),
 		Email:     "test-success@example.com",
@@ -101,29 +99,25 @@ func (s *OrderServiceTestSuite) TestCreateOrder_Success() {
 	}
 	s.Require().NoError(s.productRepo.Create(ctx, product))
 
-	// 2. Execute: Call the method to test
 	items := []service.OrderItemInput{
 		{ProductID: product.ID, Quantity: 3},
 	}
 	order, err := s.service.CreateOrder(ctx, user.ID, items)
 
-	// 3. Assert: Check the results
 	s.Assert().NoError(err)
 	s.Assert().NotNil(order)
 	s.Assert().Len(order.Items, 1)
 	s.Assert().Equal(product.Price, order.Items[0].PriceAtPurchase)
 	s.Assert().Equal(user.ID, order.UserID)
 
-	// Verify product quantity was updated
 	updatedProduct, err := s.productRepo.FindByID(ctx, product.ID)
 	s.Require().NoError(err)
-	s.Assert().Equal(7, updatedProduct.Quantity) // 10 - 3 = 7
+	s.Assert().Equal(7, updatedProduct.Quantity)
 }
 
 func (s *OrderServiceTestSuite) TestCreateOrder_InsufficientStock() {
 	ctx := context.Background()
 
-	// 1. Setup
 	user := &domain.User{
 		ID:        uuid.New(),
 		Email:     "test-fail@example.com",
@@ -139,17 +133,14 @@ func (s *OrderServiceTestSuite) TestCreateOrder_InsufficientStock() {
 	}
 	s.Require().NoError(s.productRepo.Create(ctx, product))
 
-	// 2. Execute
 	items := []service.OrderItemInput{
-		{ProductID: product.ID, Quantity: 10}, // Try to order more than in stock
+		{ProductID: product.ID, Quantity: 10},
 	}
 	_, err := s.service.CreateOrder(ctx, user.ID, items)
 
-	// 3. Assert
 	s.Assert().Error(err)
 	s.Assert().ErrorIs(err, service.ErrInsufficientStock)
 
-	// Verify product quantity did NOT change
 	updatedProduct, err := s.productRepo.FindByID(ctx, product.ID)
 	s.Require().NoError(err)
 	s.Assert().Equal(5, updatedProduct.Quantity)

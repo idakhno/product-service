@@ -9,21 +9,27 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// OrderRepository implements repository.OrderRepository interface for PostgreSQL.
 type OrderRepository struct {
 	db *pgxpool.Pool
 }
 
+// NewOrderRepository creates a new order repository for PostgreSQL.
 func NewOrderRepository(db *pgxpool.Pool) *OrderRepository {
 	return &OrderRepository{db: db}
 }
 
+// CreateTx creates an order and all its items within a transaction.
+// First creates the order record, then all order items.
 func (r *OrderRepository) CreateTx(ctx context.Context, tx pgx.Tx, order *domain.Order) error {
+	// Create order record
 	orderQuery := `INSERT INTO orders (id, user_id, created_at, total_amount) VALUES ($1, $2, $3, $4)`
 	_, err := tx.Exec(ctx, orderQuery, order.ID, order.UserID, order.CreatedAt, order.TotalAmount)
 	if err != nil {
 		return err
 	}
 
+	// Create order items
 	itemQuery := `INSERT INTO order_items (id, order_id, product_id, quantity, price_at_purchase)
 				  VALUES ($1, $2, $3, $4, $5)`
 	for _, item := range order.Items {

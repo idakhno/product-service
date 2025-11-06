@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// CreateProductRequest contains data for creating a new product.
 type CreateProductRequest struct {
 	Description string   `json:"description" example:"High-quality wireless headphones" validate:"required"`
 	Tags        []string `json:"tags" example:"audio,electronics,wireless" validate:"required"`
@@ -19,11 +20,13 @@ type CreateProductRequest struct {
 	Price       float64  `json:"price" example:"99.99" validate:"required,gt=0"`
 }
 
+// ProductHandler handles HTTP requests related to products.
 type ProductHandler struct {
 	service *service.ProductService
 	logger  logger.Logger
 }
 
+// NewProductHandler creates a new product handler.
 func NewProductHandler(s *service.ProductService, l logger.Logger) *ProductHandler {
 	return &ProductHandler{service: s, logger: l}
 }

@@ -9,6 +9,7 @@ import (
 	customvalidator "product-api/pkg/validator"
 )
 
+// RegisterRequest contains data for registering a new user.
 type RegisterRequest struct {
 	Email     string `json:"email" example:"user@example.com" validate:"required,email"`
 	Password  string `json:"password" example:"password123" validate:"required,min=8"`
@@ -18,20 +19,24 @@ type RegisterRequest struct {
 	IsMarried bool   `json:"is_married" example:"false"`
 }
 
+// LoginRequest contains data for user authentication.
 type LoginRequest struct {
 	Email    string `json:"email" example:"user@example.com" validate:"required,email"`
 	Password string `json:"password" example:"password123" validate:"required"`
 }
 
+// LoginResponse contains JWT token for authenticated user.
 type LoginResponse struct {
 	Token string `json:"token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
 }
 
+// UserHandler handles HTTP requests related to users.
 type UserHandler struct {
 	service *service.UsersService
 	logger  logger.Logger
 }
 
+// NewUserHandler creates a new user handler.
 func NewUserHandler(s *service.UsersService, l logger.Logger) *UserHandler {
 	return &UserHandler{service: s, logger: l}
 }

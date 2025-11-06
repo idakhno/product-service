@@ -10,6 +10,8 @@ import (
 
 var validate = validator.New()
 
+// DecodeAndValidate decodes JSON from request body and validates the structure.
+// Returns an error if decoding or validation fails.
 func DecodeAndValidate(r *http.Request, v interface{}) error {
 	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
 		return err
@@ -17,6 +19,9 @@ func DecodeAndValidate(r *http.Request, v interface{}) error {
 	return validate.Struct(v)
 }
 
+// HandleValidationError handles validation errors and sends JSON response to client.
+// If error is ValidationErrors, returns detailed field information.
+// Otherwise returns a generic error message.
 func HandleValidationError(w http.ResponseWriter, err error) {
 	var validationErrors validator.ValidationErrors
 	if errors.As(err, &validationErrors) {
