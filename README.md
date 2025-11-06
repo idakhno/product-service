@@ -8,7 +8,7 @@ Product API is a microservice providing REST API for working with users, product
 
 ## Technology Stack
 
-- **Go 1.24** - Programming language
+- **Go 1.25.1+** - Programming language
 - **PostgreSQL 15** - Relational database
 - **Chi** - HTTP router
 - **Docker & Docker Compose** - Containerization
